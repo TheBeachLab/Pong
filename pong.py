@@ -6,8 +6,8 @@ import random
 pygame.init()
 fpsClock = pygame.time.Clock()
 
-width = 640
-height = 480
+width = 1024
+height = 768
 
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption('Pong')
@@ -15,12 +15,12 @@ pygame.display.set_caption('Pong')
 black = pygame.Color(0, 0, 0)
 white = pygame.Color(255, 255, 255)
 
-font = pygame.font.Font("bit5x3.ttf", 80)
+font = pygame.font.Font("bit5x3.ttf", 180)
 
 # game variable
-playerPaddle = Rect((20, 480/2-20), (8, 28))
-aiPaddle = Rect((620, 480/2-20), (8, 28))
-ball = Rect((640/2+20, 480/2), (10, 10))
+playerPaddle = Rect((60, height/2-20), (8, 70))
+aiPaddle = Rect((width - 60, height/2-20), (8, 70))
+ball = Rect((width/2+30, height/2), (15, 15))
 
 maxSpeed = 10
 
@@ -82,7 +82,7 @@ while True:
             player_speed += player_a
 
     # pure-AI input
-    # if ball.x > 640/2:
+    # if ball.x > width/2:
     if ball.y > aiPaddle.centery:
         if ai_speed < maxSpeed:
             ai_speed += player_a
@@ -105,16 +105,16 @@ while True:
         playerPaddle.y = 0
         player_speed = 0
 
-    elif playerPaddle.bottom > 480:
-        playerPaddle.bottom = 480
+    elif playerPaddle.bottom > height:
+        playerPaddle.bottom = height
         player_speed = 0
 
     if aiPaddle.y < 0:
         aiPaddle.y = 0
         ai_speed = 0
 
-    elif aiPaddle.bottom > 480:
-        aiPaddle.bottom = 480
+    elif aiPaddle.bottom > height:
+        aiPaddle.bottom = height
         ai_speed = 0
 
     if playerPaddle.colliderect(ball):
@@ -141,19 +141,19 @@ while True:
         ball.y = 0
         ball_speed_y = -ball_speed_y
 
-    elif ball.y+10 >= 480:
-        ball.y = 480-10
+    elif ball.y+10 >= height:
+        ball.y = height-10
         ball_speed_y = -ball_speed_y
 
-    if ball.x < 0 or ball.x > 640:
+    if ball.x < 0 or ball.x > width:
         if ball.x < 0:
             aiScore += 1
         else:
             playerScore += 1
         ball_speed_x = speeds_x[random.randint(0, 1)]
         ball_speed_y = speeds_y[random.randint(0, 5)]
-        ball.x = 640/2
-        ball.y = 480/2
+        ball.x = width/2
+        ball.y = height/2
 
     # draw
     screen.fill(black)
@@ -162,11 +162,15 @@ while True:
     pygame.draw.rect(screen, white, ball)
     playerF = font.render(str(playerScore), True, white)
     aiF = font.render(str(aiScore), True, white)
-    screen.blit(playerF, (200, 25))
-    screen.blit(aiF, (400, 25))
+    screen.blit(playerF, (width/4, 25))
+    screen.blit(aiF, (3*width/4, 25))
 
-    for i in range(30):
-        pygame.draw.line(screen, white, (320, i*20), (320, i*20+10), 5)
+    for i in range(20):  # centerline
+        pygame.draw.line(screen, white, (width/2, i*40),
+                         (width/2, i*40+20), 5)
+
+    for n in range(0, height, 4):  # scanlines
+        pygame.draw.line(screen, (50, 50, 50), (0, n), (width, n), 2)
 
     pygame.display.update()
-    fpsClock.tick(30)
+    fpsClock.tick(60)
