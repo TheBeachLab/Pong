@@ -9,13 +9,19 @@ fpsClock = pygame.time.Clock()
 width = 1024
 height = 768
 
-screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption('Pong')
+screen = pygame.display.set_mode((width, height), FULLSCREEN)
+pygame.display.set_caption('Atari Pong')
 
 black = pygame.Color(0, 0, 0)
 white = pygame.Color(255, 255, 255)
 
-font = pygame.font.Font("bit5x3.ttf", 180)
+# sound
+playerSound = pygame.mixer.Sound('res/player.wav')
+sideSound = pygame.mixer.Sound('res/side.wav')
+failSound = pygame.mixer.Sound('res/fail.wav')
+
+# font
+font = pygame.font.Font('res/bit5x3.ttf', 180)  # needs to be taller
 
 # game variable
 playerPaddle = Rect((60, height/2-20), (8, 70))
@@ -49,9 +55,17 @@ while True:
     # player input
     for event in pygame.event.get():
         if event.type == QUIT:
-            exit()
+            pygame.QUIT()
+            sys.exit()
 
         if event.type == KEYDOWN:
+            # ESC key QUIT
+            if event.key == K_ESCAPE:
+                pygame.QUIT()
+                sys.exit()
+            # F key toggle Full Screen
+            if event.key == K_f:
+                pygame.display.toggle_fullscreen()
             # press key
             if event.key == K_UP:
                 isPressed = True
@@ -118,6 +132,7 @@ while True:
         ai_speed = 0
 
     if playerPaddle.colliderect(ball):
+        playerSound.play()
         ball_speed_x = -ball_speed_x
         if player_speed == 0:
             ball_speed_y = ball_speed_y/abs(ball_speed_y)
@@ -127,6 +142,7 @@ while True:
         ball.left = playerPaddle.right + 1
 
     elif aiPaddle.colliderect(ball):
+        playerSound.play()
         ball_speed_x = -ball_speed_x
 
         # prevent
@@ -138,14 +154,18 @@ while True:
         ball.right = aiPaddle.x - 1
 
     if ball.y <= 0:
+        sideSound.play()
         ball.y = 0
         ball_speed_y = -ball_speed_y
 
     elif ball.y+10 >= height:
+        sideSound.play()
         ball.y = height-10
         ball_speed_y = -ball_speed_y
 
     if ball.x < 0 or ball.x > width:
+        timePassed = 0.0
+        failSound.play()
         if ball.x < 0:
             aiScore += 1
         else:
@@ -170,7 +190,7 @@ while True:
                          (width/2, i*40+20), 5)
 
     for n in range(0, height, 4):  # scanlines
-        pygame.draw.line(screen, (50, 50, 50), (0, n), (width, n), 2)
+        pygame.draw.line(screen, (10, 10, 10), (0, n), (width, n), 1)
 
     pygame.display.update()
-    fpsClock.tick(60)
+    fpsClock.tick(50)
