@@ -3,6 +3,7 @@ from pygame import Rect
 from pygame.locals import *
 import random
 
+pygame.mixer.pre_init(44100, -16, 1, 512)  # fixes delay in play
 pygame.init()
 fpsClock = pygame.time.Clock()
 
@@ -28,7 +29,7 @@ playerPaddle = Rect((60, height/2-20), (8, 70))
 aiPaddle = Rect((width - 60, height/2-20), (8, 70))
 ball = Rect((width/2+30, height/2), (15, 15))
 
-maxSpeed = 10
+maxSpeed = 6
 
 player_a = 3
 player_speed = 0
@@ -193,4 +194,4 @@ while True:
         pygame.draw.line(screen, (10, 10, 10), (0, n), (width, n), 1)
 
     pygame.display.update()
-    fpsClock.tick(50)
+    fpsClock.tick(60)
